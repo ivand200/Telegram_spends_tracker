@@ -110,7 +110,7 @@ async def cmd_type_spends(message: types.Message, state: FSMContext):
         write = db.add_spend(username,category,amount)
         await state.finish()
         await message.answer(f"<u>Categoty: {message_split[0]}\n"
-                             f"Spends: {message_split[1]}</u>\n<b>{write}</b>", 
+                             f"Spends: {message_split[1]}</u>\n<b>{write}</b>",
                               parse_mode=types.ParseMode.HTML)
     else:
         await message.answer(f"{username} Please use existing categories!")
@@ -126,7 +126,7 @@ async def cmd_statistics(message: types.Message):
 
 
 @dp.message_handler(Text(equals="Daily"))
-async def cmd_daily_statistics(message: types.Message):
+async def cmd_daily_stat(message: types.Message):
     stat = list()
     total = 0
     username = message.chat.username
@@ -143,10 +143,7 @@ async def cmd_daily_statistics(message: types.Message):
     await message.answer(f"<u>{spends_clear}</u>\n<b>Total\n{total}</b>", parse_mode=types.ParseMode.HTML)
 
 @dp.message_handler(Text(equals="Month"))
-async def cmd_spends(message: types.Message):
-    keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
-    buttons = ["Back"]
-    keyboard.add(*buttons)
+async def cmd_month_stat(message: types.Message):
     username = message.chat.username
     categories = db.select_categories()
     stat = list()

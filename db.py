@@ -3,12 +3,9 @@ from datetime import datetime, timedelta
 
 
 now = datetime.now()
-lastmonth = now - timedelta(weeks=6)
-endoflastmonth = lastmonth.replace(day=30)
-month2 = endoflastmonth.strftime("%Y-%m-%d")
-
-this_month_raw = now.replace(day=1)
-this_month = this_month_raw.strftime("%Y-%m-%d")
+today_raw = now.replace(day=1)
+today = now.strftime("%Y-%m-%d")
+month = today_raw.strftime("%Y-%m-%d")
 
 
 conn = sqlite3.connect("db.db")
@@ -47,25 +44,28 @@ def add_spend(user,category,amount):
     username_id = get_user_id(user)
     category_id = get_category_id(category)
     try:
+        amount = float(amount)
         cur.execute("""INSERT INTO spend (user_id, category_id, amount, date)
                      VALUES (?, ?, ?, datetime('now','localtime'))""",
                      (username_id, category_id, amount,))
         conn.commit()
         return "Done!"
     except:
-        return "Wrong category!"
+        return "Something wrong!"
 
 def get_today_statistics(user,category):
     username_id = get_user_id(user)
     category_id = get_category_id(category)
     cur.execute(f"""SELECT SUM(amount) FROM spend WHERE user_id = (?) AND category_id = (?)
-                        AND date(date) = date('now')""", (username_id, category_id))
+                        AND date(date) = date('{today}')""", (username_id, category_id))
     result = cur.fetchone()[0]
     return result
 
 
 def get_month_statistics(user,category):
-    cur.execute(f"""SELECT SUM(spends.{category}) FROM spends WHERE user_id = (?)
-                    AND date(date) >= date({this_month})""", (user,))
-    result = cur.fetchall()[0][0]
+    username_id = get_user_id(user)
+    category_id = get_category_id(category)
+    cur.execute(f"""SELECT SUM(amount) FROM spend WHERE user_id = (?) AND category_id = (?)
+                        AND date(date) >= date('{month}')""", (username_id, category_id))
+    result = cur.fetchone()[0]
     return result
