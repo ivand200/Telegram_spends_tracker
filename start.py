@@ -55,10 +55,11 @@ async def cmd_add_spends(message: types.Message):
         keyboard.add(item)
     spends_ = "\n".join(str(el) for el in spends)
     spends_clear = spends_.replace('(','').replace(')','').replace("'","")
-    await message.answer(f"{spends}Please, choose one category.\nOr choose 'Type'", reply_markup=keyboard, parse_mode=types.ParseMode.HTML)
+    await message.answer(f"{spends}Please, choose one category.\nOr choose 'Type'",
+                         reply_markup=keyboard, parse_mode=types.ParseMode.HTML)
 
 
-"""Selected category"""
+"""By category"""
 user_data = {}
 @dp.message_handler(text=db.select_categories())
 async def text_in_handler(message: types.Message):
@@ -75,7 +76,8 @@ async def cmd_write_spends(message: types.Message, state: FSMContext):
     category = user_data[message.chat.username]
     write = db.add_spend(username,category,spends)
     await state.finish()
-    await message.answer(f"<u>Categoty: {category}\nSpends: {spends}</u>\n<b>{write}</b>", parse_mode=types.ParseMode.HTML)
+    await message.answer(f"<u>Categoty: {category}\nSpends: {spends}</u>\n<b>{write}</b>",
+                          parse_mode=types.ParseMode.HTML)
 
 
 """Type spends"""
@@ -124,7 +126,7 @@ async def cmd_statistics(message: types.Message):
     keyboard.add(*buttons)
     await message.answer("Statistics", reply_markup=keyboard)
 
-
+# Daily stat
 @dp.message_handler(Text(equals="Daily"))
 async def cmd_daily_stat(message: types.Message):
     stat = list()
@@ -140,8 +142,10 @@ async def cmd_daily_stat(message: types.Message):
             stat.append(newtup)
     spends_ = "\n".join(str(el) for el in stat)
     spends_clear = spends_.replace('(','').replace(')','').replace("'","")
-    await message.answer(f"<u>{spends_clear}</u>\n<b>Total\n{total}</b>", parse_mode=types.ParseMode.HTML)
+    await message.answer(f"<u>{spends_clear}</u>\n<b>Total\n{total}</b>",
+                         parse_mode=types.ParseMode.HTML)
 
+# Month stat
 @dp.message_handler(Text(equals="Month"))
 async def cmd_month_stat(message: types.Message):
     username = message.chat.username
@@ -157,7 +161,8 @@ async def cmd_month_stat(message: types.Message):
             stat.append(newtup)
     spends_ = "\n".join(str(el) for el in stat)
     spends_clear = spends_.replace('(','').replace(')','').replace("'","")
-    await message.answer(f"<u>{spends_clear}</u>\n<b>Total\n{total}</b>", parse_mode=types.ParseMode.HTML)
+    await message.answer(f"<u>{spends_clear}</u>\n<b>Total\n{total}</b>",
+                         parse_mode=types.ParseMode.HTML)
 
 @dp.message_handler(Text(equals="Delete spends"))
 async def cmd_delete(message: types.Message):
