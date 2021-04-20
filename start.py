@@ -29,6 +29,9 @@ class Form(StatesGroup):
 class Form2(StatesGroup):
     spends_write = State()
 
+class Form3(StatesGroup):
+    spends_del = State()
+
 
 """Main menu"""
 @dp.message_handler(commands=["start"])
@@ -164,9 +167,29 @@ async def cmd_month_stat(message: types.Message):
     await message.answer(f"<u>{spends_clear}</u>\n<b>Total\n{total}</b>",
                          parse_mode=types.ParseMode.HTML)
 
-@dp.message_handler(Text(equals="Delete spends"))
+# Delete spends
+@dp.message_handler(Text(equals="Delete"))
 async def cmd_delete(message: types.Message):
-    await message.answer("here list of categories from db\nChoose one to delete and type")
+    keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
+    button = ["Cancel", "Back"]
+    lst = list()
+    username = message.chat.username
+    lst = db.get_last_spends(username)
+    last = "\n".join(str(el) for el in lst)
+    last_spends = last.replace('(','').replace(')','').replace("'","")
+    await Form3.spends_del.set()
+    keyboard.add(*button)
+    await message.answer(f"Please, choose id of spend you want to delete\n"
+                         f"{last_spends}", reply_markup=keyboard)
+
+@dp.message_handler(state=Form3.spends_del)
+async def cmd_del_2(message: types.Message, state: FSMContext):
+    username = message.chat.username
+    spend_id = message.text
+    del_spend = db.del_spend(username,spend_id)
+    await state.finish()
+    await message.answer(f"{del_spend}")
+
 
 if __name__ == "__main__" :
     # Запуск бота

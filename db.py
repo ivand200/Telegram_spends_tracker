@@ -69,3 +69,18 @@ def get_month_statistics(user,category):
                         AND date(date) >= date('{month}')""", (username_id, category_id))
     result = cur.fetchone()[0]
     return result
+
+
+def get_last_spends(user):
+    username_id = get_user_id(user)
+    cur.execute("""SELECT spend.id, spend.amount, category.name
+                 FROM spend JOIN category ON  category.id = spend.category_id
+                 WHERE user_id = (?) ORDER BY date DESC LIMIT 3""", (username_id,))
+    result = cur.fetchall()
+    return result
+
+def del_spend(user, id):
+    username_id = get_user_id(user)
+    cur.execute("""DELETE FROM spend WHERE id = (?) AND user_id = (?)""", (id, username_id))
+    conn.commit()
+    return f"Your spend {id} was deleted"
